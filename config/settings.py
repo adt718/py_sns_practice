@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'allauth',                      
     'allauth.account',              
     'allauth.socialaccount',
-    'bootstrap4',        
+    'bootstrap4',
+    'accounts.apps.AccountsConfig',  
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ###### ↓認証系の設定 #####
+
 AUTHENTICATION_BACKENDS = (
   'django.contrib.auth.backends.ModelBackend',
   'allauth.account.auth_backends.AuthenticationBackend',  
@@ -146,7 +148,7 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/accounts/email'            #ログイン成功時のリダイレクトページ 
 LOGIN_REDIRECT_URL = 'home'#リダイレクト先をhomeページに設定。詳細後述          
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login'
 
 ###### メール送信アクションの設定 #####
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"      #おまじない(Email送信機能利用のために記述)

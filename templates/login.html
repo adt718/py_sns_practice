@@ -11,7 +11,7 @@
 <h1>ログイン画面</h1>
 
 <div class="reg">
-  <form method="post" action="{% url 'Login' %}">
+  <form method="post" action="{% url 'snsapp:Login' %}">
     {% csrf_token %}
 
     <table class="reg_form">
@@ -27,7 +27,7 @@
  </form>
 </div>
    <p class="message">アカウントをお持ちですか？：
-   <a href="{% url 'register' %}">アカウントを作成</a>
+   <a href="{% url 'snsapp:register' %}">アカウントを作成</a>
    </p>
 </body>
 </html>

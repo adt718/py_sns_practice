@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
@@ -41,6 +42,7 @@ class CreatePost(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('mypost')
 
     def form_valid(self, form):
+        
         """投稿ユーザーをリクエストユーザーと紐付け"""
         form.instance.user = self.request.user
         return super().form_valid(form)
@@ -62,7 +64,7 @@ class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     template_name = 'update.html'
     fields = ['title', 'content']
-
+    success_url = reverse_lazy('snsapp:list.html')
 
     def get_success_url(self,  **kwargs):
         """編集完了後の遷移先"""
@@ -75,13 +77,41 @@ class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = Post.objects.get(pk=pk)
         return (post.user == self.request.user) 
 
+class EditView(View):
+    model = Post
+    def get(self, request, pk, *args, **kwargs):
+
+        #編集対象を特定してレンダリング
+        pk = Post.objects.filter(id=pk).first()
+        context = { "post":Post }
+
+        return render(request,'edit.html',context)
+
+    def post(self, request, pk, *args, **kwargs):
+
+#         #編集対象を特定
+        Post   = Post.objects.filter(id=pk).first()
+
+#         #instanceに編集対象を指定して、request.POSTをバリデーション(※ これで編集対象の内容が書き換わる。もし、instanceが存在しない場合、新しく作られる。)
+        form    = Post(request.POST,instance=Post)
+
+        if form.is_valid():
+            print("バリデーションOK")
+            form.save()
+        else:
+            print("バリデーションNG")
+
+        return redirect("snsapp:index")
+
+edit    = EditView.as_view()
 
 class DeletePost(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """投稿編集ページ"""
     model = Post
     template_name = 'delete.html'
-    success_url = reverse_lazy('mypost')
-
+    success_url = reverse_lazy('snsapp:mypost')
+    
+    
     def test_func(self, **kwargs):
         """アクセスできるユーザーを制限"""
         pk = self.kwargs["pk"]
@@ -108,7 +138,7 @@ class LikeHome(LikeBase):
     """HOMEページでいいねした場合"""
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        return redirect('home')
+        return redirect('snsapp:home')
 
 
 class LikeDetail(LikeBase):
@@ -116,7 +146,7 @@ class LikeDetail(LikeBase):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         pk = self.kwargs['pk'] 
-        return redirect('detail', pk)
+        return redirect('snsapp:detail', pk)
 ###############################################################
 
 
@@ -140,14 +170,14 @@ class FollowHome(FollowBase):
     """HOMEページでフォローした場合"""
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
-        return redirect('home')
+        return redirect('snsapp:home')
 
 class FollowDetail(FollowBase):
     """詳細ページでフォローした場合"""
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
         pk = self.kwargs['pk'] 
-        return redirect('detail', pk)
+        return redirect('snsapp:detail', pk)
 ###############################################################
 
 
